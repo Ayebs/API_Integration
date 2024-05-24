@@ -2,21 +2,23 @@ package com.exercise.demo.externalApi;
 
 import com.exercise.demo.model.ExternalApiResponse;
 import com.exercise.demo.model.ExternalApiRequest;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-//import java.net.http.HttpHeaders;
 
 @Component
 public class ExternalApiClient {
 
-//    @Value("${external.api.url}")
-//    private String externalApiUrl;
-    String exUrl = "https://business.mykowri.com/billing/lookup";
+    @Value("${external.api.url}")
+    private String externalApiUrl;
+//    String exUrl = "https://business.mykowri.com/billing/lookup";
+
+    @Value("${external.api.auth}")
+    private String externalApiAuth;
 
     private final RestTemplate restTemplate;
 
@@ -24,15 +26,20 @@ public class ExternalApiClient {
         this.restTemplate = restTemplate;
     }
 
+    @PostConstruct
+    public void init() {
+        System.out.println("ExternalApiClient initialized with URL: " + externalApiUrl);
+    }
+
    public ExternalApiResponse getStudentDetails(ExternalApiRequest request) {
 
        HttpHeaders headers = new HttpHeaders();
-       headers.set("Authorization", "Basic dXNlcjp0MzV0cEA1NQ==");
+       headers.set("Authorization", externalApiAuth);
        headers.setContentType(MediaType.APPLICATION_JSON);
 
        HttpEntity<ExternalApiRequest> entity = new HttpEntity<>(request, headers);
 
-       return restTemplate.exchange(exUrl, HttpMethod.POST, entity, ExternalApiResponse.class).getBody();
+       return restTemplate.exchange(externalApiUrl, HttpMethod.POST, entity, ExternalApiResponse.class).getBody();
 
     }
 }

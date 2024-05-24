@@ -4,6 +4,7 @@ package com.exercise.demo.service;
 import com.exercise.demo.externalApi.ExternalApiClient;
 import com.exercise.demo.model.*;
 import com.exercise.demo.util.ApiMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,6 +14,7 @@ public class StudentService {
 
     private final ExternalApiClient externalApiClient;
 
+    @Autowired
     public StudentService(ExternalApiClient externalApiClient) {
         this.externalApiClient = externalApiClient;
     }
