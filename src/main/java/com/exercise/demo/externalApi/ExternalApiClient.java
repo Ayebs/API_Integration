@@ -15,7 +15,6 @@ public class ExternalApiClient {
 
     @Value("${external.api.url}")
     private String externalApiUrl;
-//    String exUrl = "https://business.mykowri.com/billing/lookup";
 
     @Value("${external.api.auth}")
     private String externalApiAuth;

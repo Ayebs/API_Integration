@@ -4,15 +4,22 @@ package com.exercise.demo.service;
 import com.exercise.demo.externalApi.ExternalApiClient;
 import com.exercise.demo.model.*;
 import com.exercise.demo.util.ApiMapper;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
 public class StudentService {
 
     private final ExternalApiClient externalApiClient;
+
+    //Loading groovy script
+    private final GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
 
     @Autowired
     public StudentService(ExternalApiClient externalApiClient) {
@@ -29,8 +36,18 @@ public class StudentService {
 
         ExternalApiResponse externalResponse = externalApiClient.getStudentDetails(externalRequest);
 
-//        System.out.println(request);
-        System.out.println("Api Mapper" + ApiMapper.toStudentResponse(externalResponse));
-        return ApiMapper.toStudentResponse(externalResponse);
+        try {
+            Class<?> groovyClass = groovyClassLoader.parseClass(new File("src/main/java/com/exercise/demo/util/ApiMapper.groovy"));
+
+            GroovyObject groovyObject = (GroovyObject) groovyClass.getDeclaredConstructor().newInstance();
+
+            return (StudentResponse) groovyClass
+                    .getMethod("toStudentResponse", ExternalApiResponse.class)
+                    .invoke(groovyObject, externalResponse);
+        } catch (IOException | ReflectiveOperationException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
 }
